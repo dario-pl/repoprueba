@@ -32,14 +32,14 @@ services:
   git-sync:
     image: alpine/git
     volumes:
-      - wp_custom:/web
+      - wp_custom:/tema
     entrypoint: /bin/sh
     command:
       - -c
       - |
         rm -rf /tmp/repo
         git clone https://github.com/dario-pl/repoprueba.git /tmp/repo
-        cp -r /tmp/repo/src/. /web/
+        cp -r /tmp/repo/web/. /tema/
     depends_on:
       - wordpress
     restart: "no"
