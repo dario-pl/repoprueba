@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: webfusion-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: wordpress-db
+      MYSQL_USER: wp-user
+      MYSQL_PASSWORD: wp-password
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:latest
+    container_name: webfusion-wordpress
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress_db
+      WORDPRESS_DB_USER: wp-user
+      WORDPRESS_DB_PASSWORD: wp-password
+    volumes:
+      - wp_data:/var/www/html
+
+  git-sync:
+    image: alpine/git
+    container_name: webfusion-git
+    restart: "no"
+    depends_on:
+      - wordpress
+    volumes:
+      - wp_data:/wp_html
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git /tmp/repo
+        cp -r /tmp/repo/. /wp_html/
+
+volumes:
+  db_data:
+  wp_data:
